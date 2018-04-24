@@ -1,0 +1,15 @@
+.login {
+    width: 100vw;
+    min-width: 1000px;
+    min-height: 800px;
+    height: 100vh;
+}
+
+.login .content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 800px;
+    height: 80vh;
+    flex-direction: column;
+}

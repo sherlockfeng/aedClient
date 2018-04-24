@@ -1,0 +1,33 @@
+.Data {
+    height: 100%;
+}
+
+.Data .ant-layout {
+    height: 100%;
+}
+
+.Data .trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color .3s;
+  }
+  
+.Data .trigger:hover {
+    color: #1890ff;
+  }
+  
+.Data .logo {
+    height: 32px;
+    background: rgba(255,255,255,.2);
+    margin: 16px;
+}
+
+.Data .logo p {
+    height: 32px;
+    margin: auto;
+    text-align: center;
+    line-height: 32px;
+    color: aliceblue;
+}

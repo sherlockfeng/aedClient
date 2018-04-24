@@ -1,0 +1,13 @@
+.userinfo {
+    position: absolute;
+    right: 80px;
+    top: 20px;
+    font-size: 16px;
+}
+
+.logout {
+    width: 100%;
+    position: absolute;
+    border: 1px solid #ddd;
+    border-top: none
+}
