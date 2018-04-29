@@ -31,3 +31,16 @@
     line-height: 32px;
     color: aliceblue;
 }
+
+.Data .smallimg {
+    height: 100px;
+    width: 100px;
+    margin-right: 20px;
+    margin-bottom: 20px
+}
+
+.Data .imglist {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}

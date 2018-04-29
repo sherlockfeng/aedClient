@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Head from '../head/head'
 import './data.css';
-import { Layout, Icon, Table, Divider, Button, Modal, Input, Spin, Radio, AutoComplete  } from 'antd';
+import { Layout, Icon, Table, Divider, Button, Modal, Input, Spin, Radio, AutoComplete, Upload, message } from 'antd';
 import  {Fetch, Notification } from '../util'
 import  {Url } from '../lib'
 import UserInfo from '../userInfo/userInfo'
@@ -12,8 +12,9 @@ const Search = Input.Search;
 const idToText = { 0: '已启用', 1: '已停用'}
 const textToId = { '已启用': 0, '已停用': 1}
 
-// let latitude = ''
-// let longitude = ''
+const imgType = ['jpg', 'jpeg', 'png']
+
+// let filename = ''
 
 class Data extends Component {
 
@@ -75,13 +76,25 @@ class Data extends Component {
       title: '操作',
       key: 'action',
       render: (text, record) => (
-        <span>
+        <div>
           <span onClick={this.showModal.bind(this, 'modifyVisible', text)} style={{color: '#1890ff', cursor:'pointer'}}>编辑</span>
           <Divider type="vertical" />
           <span style={{color: '#1890ff', cursor:'pointer'}} onClick={this.showModal.bind(this, 'deleteVisible', text)}>删除</span>
-        </span>
+          <Divider type="vertical" />
+          <Upload  style={{color: '#1890ff', cursor:'pointer'}}
+             name = 'file'
+             action = {Url.upload+'?filename='+this.state.filename}
+             onChange = {this.handleUpload.bind(this, text)}
+             beforeUpload = {this.beforeUpload.bind(this, text)}
+             showUploadList = {false}
+          >
+            <span>上传</span>
+          </Upload>
+        </div>
       ),
     }],
+
+    filename: '',
     data : [],
     dataAll: [],
     dataOn: [],
@@ -129,6 +142,48 @@ class Data extends Component {
     longitude:''
 
   };
+
+  handleUpload = (text, info) => {
+    if (info.file.status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
+    if (info.file.status === 'done') {
+      message.success('上传图片成功');
+      Fetch(Url.aedInfo, {}).then((data) => {
+        this.handleList(data)
+      }).catch((err) => {
+        Notification('error', err.toString(), '', 1)
+        this.setState({
+          confirmLoading: false
+        })
+      })
+    } else if (info.file.status === 'error') {
+      message.error('上传图片失败');
+    }
+  }
+
+  beforeUpload = (text, file) => {
+    let isImg = false
+
+    for(let i = 0;i < imgType.length; i++) {
+      if(file.type.toLowerCase().indexOf(imgType[i].toLowerCase())!==-1){
+        isImg = true
+      }
+    }
+    if(!isImg){
+      message.error('只能上传图片文件');
+      return false
+    }
+
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('图片必须小于2M');
+      return false
+    }
+    this.setState({
+      filename: text._id
+    })
+  }
 
   getAddress = (value, type) => {
     // eslint-disable-next-line
@@ -472,6 +527,14 @@ class Data extends Component {
 
   }
 
+  showBigImg = (value, name) => {
+
+  }
+
+  deleteImg = (value, name) => {
+
+  }
+
   render() {
     const { modifyVisible, deleteVisible, confirmLoading, newVisible, selectedRowKeys } = this.state;
     const rowSelection = {
@@ -518,7 +581,15 @@ class Data extends Component {
                 </RadioGroup>
                 <Search placeholder="请输入" onSearch={this.searchInfo} value={this.state.searchInfoValue} onChange={this.handleInputText.bind(this, 'searchInfoValue')} style={{ width: 200, marginLeft: 30 }}/>
               </div>
-              <Table rowSelection={rowSelection} columns={this.state.columns} dataSource={this.state.data} />
+              <Table rowSelection={rowSelection} columns={this.state.columns} dataSource={this.state.data} expandedRowRender={(record) => {
+                let list = record.imglist.map((value, index) => {
+                  return <div className="imglist">
+                    <img alt="img" className="smallimg" src={Url.imgSrc + record._id + '/' + value} onClick={this.showBigImg.bind(this, record, value)}/>
+                    <Icon type="close-circle" style={{position:'absolute',top:'-5px',right:'20px'}} onClick={this.deleteImg.bind(this, record, value)}/>
+                  </div>
+                })
+                return list
+              }}/>
             </Spin>
 
             <Modal title="编辑"
