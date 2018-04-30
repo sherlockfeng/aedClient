@@ -18,8 +18,9 @@ const Url = {
     tips: host + 'tips',
 
     upload: host + 'upload',
+    deleteImg: host + 'deleteImg',
 
-    imgSrc: 'http://localhost:3001/images/'
+    imgSrc: host+ 'images/'
 }
 
 const jumpUrl = {

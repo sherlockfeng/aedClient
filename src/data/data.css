@@ -44,3 +44,8 @@
     display: inline-block;
     cursor: pointer;
 }
+
+.Data .ant-table-content{
+    overflow-y: auto;
+    max-height: 70vh
+}

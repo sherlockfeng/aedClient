@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Head from '../head/head'
 import './data.css';
-import { Layout, Icon, Table, Divider, Button, Modal, Input, Spin, Radio, AutoComplete, Upload, message } from 'antd';
+import { Layout, Icon, Table, Divider, Button, Modal, Input, Spin, Radio, AutoComplete, Upload, message, Tooltip  } from 'antd';
 import  {Fetch, Notification } from '../util'
 import  {Url } from '../lib'
 import UserInfo from '../userInfo/userInfo'
@@ -54,6 +54,8 @@ class Data extends Component {
     })
   }
   state = {
+    showImgSource: '',
+    imgVisible: false,
     dataSource:[],
     collapsed: false,
     columns: [{
@@ -81,14 +83,19 @@ class Data extends Component {
           <Divider type="vertical" />
           <span style={{color: '#1890ff', cursor:'pointer'}} onClick={this.showModal.bind(this, 'deleteVisible', text)}>删除</span>
           <Divider type="vertical" />
-          <Upload  style={{color: '#1890ff', cursor:'pointer'}}
-             name = 'file'
-             action = {Url.upload+'?filename='+this.state.filename}
-             onChange = {this.handleUpload.bind(this, text)}
-             beforeUpload = {this.beforeUpload.bind(this, text)}
-             showUploadList = {false}
+          <Upload  style={{color: '#1890ff', cursor:text.imglist.length < 3 ?'pointer':'default'}}
+            disabled = {text.imglist.length < 3 ? false : true}
+            name = 'file'
+            action = {Url.upload+'?filename='+this.state.filename}
+            onChange = {this.handleUpload.bind(this, text)}
+            beforeUpload = {this.beforeUpload.bind(this, text)}
+            showUploadList = {false}
           >
-            <span>上传</span>
+          {text.imglist.length < 3 ? 
+              <span>上传</span>
+             : <Tooltip title="已上传3张图片">
+                <span>上传</span>
+              </Tooltip>}
           </Upload>
         </div>
       ),
@@ -144,6 +151,7 @@ class Data extends Component {
   };
 
   handleUpload = (text, info) => {
+    console.log(text.imglist.length)
     if (info.file.status !== 'uploading') {
       console.log(info.file, info.fileList);
     }
@@ -528,11 +536,31 @@ class Data extends Component {
   }
 
   showBigImg = (value, name) => {
-
+    this.setState({
+      showImgSource: Url.imgSrc+value._id+'/'+name,
+      imgVisible: true
+    })
   }
 
   deleteImg = (value, name) => {
-
+    Fetch(Url.deleteImg, {
+      headers: { 
+        "Content-Type": "application/json"
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        id:value._id
+      })
+    }).then((datas) => {
+      Fetch(Url.aedInfo, {}).then((data) => {
+        this.handleList(data)
+      }).catch((err) => {
+        Notification('error', err.toString(), '', 1)
+      })
+    }).catch((err) => {
+      Notification('error', err.toString(), '', 1)
+    })
   }
 
   render() {
@@ -583,7 +611,7 @@ class Data extends Component {
               </div>
               <Table rowSelection={rowSelection} columns={this.state.columns} dataSource={this.state.data} expandedRowRender={(record) => {
                 let list = record.imglist.map((value, index) => {
-                  return <div className="imglist">
+                  return <div className="imglist" key={index}>
                     <img alt="img" className="smallimg" src={Url.imgSrc + record._id + '/' + value} onClick={this.showBigImg.bind(this, record, value)}/>
                     <Icon type="close-circle" style={{position:'absolute',top:'-5px',right:'20px'}} onClick={this.deleteImg.bind(this, record, value)}/>
                   </div>
@@ -637,6 +665,22 @@ class Data extends Component {
                   <Radio value={0}>启用</Radio>
                   <Radio value={1}>停用</Radio>
                 </RadioGroup>
+              </div>
+            </Modal>
+
+            <Modal title=""
+              bodyStyle={{
+                width:'524px',
+                height:'524px'
+              }}
+              width={524}
+              style={{ top: 200 }}
+              visible={this.state.imgVisible}
+              footer={null}
+              onCancel={this.handleCancel.bind(this, 'imgVisible')}
+            >
+              <div>
+                <img style={{width:'476px',height:'476px'}}  alt='img' src={this.state.showImgSource}/>
               </div>
             </Modal>
           </Content>
