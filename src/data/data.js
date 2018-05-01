@@ -54,7 +54,9 @@ class Data extends Component {
     })
   }
   state = {
+    isMR:0,
     showImgSource: '',
+    locationDec:'',
     imgVisible: false,
     dataSource:[],
     collapsed: false,
@@ -215,7 +217,9 @@ class Data extends Component {
             latitude: detail.location.lat,
             longitude: detail.location.lng,
             status: this.state.radioValue,
-            address: this.state.addressValue
+            address: this.state.addressValue,
+            ismr: this.state.isMR,
+            dec: this.state.locationDec
           }
           if(detail.addressComponents.city){
             params.city = detail.addressComponents.city.replace('市','')
@@ -234,7 +238,9 @@ class Data extends Component {
               this.setState({
                 addressValue: '',
                 locationValue: '',
-                radioValue: 0
+                radioValue: 0,
+                isMR: 0,
+                locationDec: ''
               })
             }).catch((err) => {
               Notification('error', err.toString(), '', 1)
@@ -316,7 +322,9 @@ class Data extends Component {
         // locationValue: '纬度：' + text.latitude + ', 经度：' + text.longitude,
         status: textToId[tempText.status],
         latitude: text.latitude,
-        longitude: text.longitude
+        longitude: text.longitude,
+        locationDec: text.dec,
+        isMR: text.ismr
       })
 
     }
@@ -333,7 +341,9 @@ class Data extends Component {
           latitude: this.state.latitude,
           longitude: this.state.longitude,
           status: this.state.radioValue,
-          address: this.state.addressValue
+          address: this.state.addressValue,
+          dec: this.state.locationDec,
+          ismr: this.state.isMR
         }
         params.id = this.state.selectValue[0]._id
         Fetch(Url.modifyAed, {
@@ -352,7 +362,9 @@ class Data extends Component {
             selectValue: [],
             finalValue: [],
             longitude: '',
-            latitude: ''
+            latitude: '',
+            isMR:0,
+            locationDec:''
           })
 
         }).catch((err) => {
@@ -434,6 +446,12 @@ class Data extends Component {
   handleRadio = (e) => {
     this.setState({
       radioValue: e.target.value
+    })
+  }
+
+  handleMR = (e) => {
+    this.setState({
+      isMR: e.target.value
     })
   }
 
@@ -563,6 +581,12 @@ class Data extends Component {
     })
   }
 
+  handleDecInput = (e) => {
+    this.setState({
+      locationDec: e.target.value
+    })
+  }
+
   render() {
     const { modifyVisible, deleteVisible, confirmLoading, newVisible, selectedRowKeys } = this.state;
     const rowSelection = {
@@ -633,9 +657,15 @@ class Data extends Component {
                 {/* <Input addonBefore="经纬度" placeholder="自动匹配" value={this.state.locationValue} style={{ width: 400, marginTop: 30 }} disabled={true}/> */}
                 <Input addonBefore="经度" placeholder="经度" value={this.state.longitude} style={{ width: 400, marginTop: 30 }} onChange={this.handleJWD.bind(this, 'longitude')}/>
                 <Input addonBefore="纬度" placeholder="纬度" value={this.state.latitude} style={{ width: 400, marginTop: 30 }}  onChange={this.handleJWD.bind(this, 'latitude')}/>
+                <Input placeholder="详细地址" value={this.state.locationDec} style={{ width: 400, marginTop: 30 }} onChange={this.handleDecInput.bind(this)} />
                 <RadioGroup onChange={this.handleRadio.bind(this)} value={this.state.radioValue} style={{ marginTop: 30, marginLeft: 10}}>
                   <Radio value={0}>启用</Radio>
                   <Radio value={1}>停用</Radio>
+                </RadioGroup>
+                <Divider type="vertical" />
+                <RadioGroup onChange={this.handleMR.bind(this)} value={this.state.isMR} style={{ marginTop: 30, marginLeft: 10}}>
+                  <Radio value={0}>迈瑞</Radio>
+                  <Radio value={1}>其他</Radio>
                 </RadioGroup>
               </div>
             </Modal>
@@ -661,9 +691,15 @@ class Data extends Component {
               <div>
                 <AutoComplete addonBefore="地址" placeholder="请输入地址" value={this.state.addressValue} dataSource={this.state.dataSource} onSelect={this.onSelect.bind(this,'newVisible')} onSearch={this.handleInput.bind(this)} style={{ width: 400 }}/>
                 <Input addonBefore="经纬度" placeholder="自动匹配" value={this.state.locationValue} style={{ width: 400, marginTop: 30 }} disabled={true}/>
+                <Input placeholder="详细地址" value={this.state.locationDec} style={{ width: 400, marginTop: 30 }} onChange={this.handleDecInput.bind(this)} />
                 <RadioGroup onChange={this.handleRadio.bind(this)} value={this.state.radioValue} style={{ marginTop: 30, marginLeft: 10}}>
                   <Radio value={0}>启用</Radio>
                   <Radio value={1}>停用</Radio>
+                </RadioGroup>
+                <Divider type="vertical" />
+                <RadioGroup onChange={this.handleMR.bind(this)} value={this.state.isMR} style={{ marginTop: 30, marginLeft: 10}}>
+                  <Radio value={0}>迈瑞</Radio>
+                  <Radio value={1}>其他</Radio>
                 </RadioGroup>
               </div>
             </Modal>
