@@ -60,10 +60,15 @@ class Data extends Component {
     imgVisible: false,
     dataSource:[],
     collapsed: false,
+    aedPhone:'',
     columns: [{
       title: 'AED详细地址',
       dataIndex: 'address',
       key: 'address',
+    }, {
+      title: '联系电话',
+      dataIndex: 'phone',
+      key: 'phone',
     }, {
       title: '经纬度',
       dataIndex: 'location',
@@ -127,7 +132,8 @@ class Data extends Component {
       longitude: '',
       updatetime: '',
       status: '',
-      id: ''
+      id: '',
+      aedPhone: ''
     }],
 
     finalValue: [{
@@ -137,7 +143,8 @@ class Data extends Component {
       longitude: '',
       updatetime: '',
       status: '',
-      id: ''
+      id: '',
+      aedPhone: ''
     }],
 
     selectedRowValue: [],
@@ -219,7 +226,8 @@ class Data extends Component {
             status: this.state.radioValue,
             address: this.state.addressValue,
             ismr: this.state.isMR,
-            dec: this.state.locationDec
+            dec: this.state.locationDec,
+            aedPhone: this.state.aedPhone,
           }
           if(detail.addressComponents.city){
             params.city = detail.addressComponents.city.replace('市','')
@@ -240,31 +248,8 @@ class Data extends Component {
                 locationValue: '',
                 radioValue: 0,
                 isMR: 0,
-                locationDec: ''
-              })
-            }).catch((err) => {
-              Notification('error', err.toString(), '', 1)
-            })
-            this.setState({
-              confirmLoading: false,
-            })
-          }else if(type === 'modifyVisible') {
-            params.id = this.state.selectValue[0]._id
-            Fetch(Url.modifyAed, {
-              headers: { 
-                "Content-Type": "application/json"
-              },
-              method: 'POST',
-              body: JSON.stringify(params)
-            }).then((data) => {
-              this.handleList(data)
-              this.setState({
-                addressValue: '',
-                locationValue: '',
-                radioValue: 0,
-                [type]: false,
-                selectValue: [],
-                finalValue: []
+                locationDec: '',
+                aedPhone: '',
               })
             }).catch((err) => {
               Notification('error', err.toString(), '', 1)
@@ -273,8 +258,6 @@ class Data extends Component {
               confirmLoading: false,
             })
           }
-          
-
         });
         //若服务请求失败，则运行以下函数
         geocoder.setError(() => {
@@ -324,7 +307,8 @@ class Data extends Component {
         latitude: text.latitude,
         longitude: text.longitude,
         locationDec: text.dec,
-        isMR: text.ismr
+        isMR: text.ismr,
+        aedPhone: text.phone || ''
       })
 
     }
@@ -343,7 +327,8 @@ class Data extends Component {
           status: this.state.radioValue,
           address: this.state.addressValue,
           dec: this.state.locationDec,
-          ismr: this.state.isMR
+          ismr: this.state.isMR,
+          aedPhone: this.state.aedPhone,
         }
         params.id = this.state.selectValue[0]._id
         Fetch(Url.modifyAed, {
@@ -657,6 +642,7 @@ class Data extends Component {
                 {/* <Input addonBefore="经纬度" placeholder="自动匹配" value={this.state.locationValue} style={{ width: 400, marginTop: 30 }} disabled={true}/> */}
                 <Input addonBefore="经度" placeholder="经度" value={this.state.longitude} style={{ width: 400, marginTop: 30 }} onChange={this.handleJWD.bind(this, 'longitude')}/>
                 <Input addonBefore="纬度" placeholder="纬度" value={this.state.latitude} style={{ width: 400, marginTop: 30 }}  onChange={this.handleJWD.bind(this, 'latitude')}/>
+                <Input placeholder="联系电话" value={this.state.aedPhone} style={{ width: 400, marginTop: 30 }} onChange={this.handleInputText.bind(this, 'aedPhone')} />
                 <Input placeholder="详细地址" value={this.state.locationDec} style={{ width: 400, marginTop: 30 }} onChange={this.handleDecInput.bind(this)} />
                 <RadioGroup onChange={this.handleRadio.bind(this)} value={this.state.radioValue} style={{ marginTop: 30, marginLeft: 10}}>
                   <Radio value={0}>启用</Radio>
@@ -691,6 +677,7 @@ class Data extends Component {
               <div>
                 <AutoComplete addonBefore="地址" placeholder="请输入地址" value={this.state.addressValue} dataSource={this.state.dataSource} onSelect={this.onSelect.bind(this,'newVisible')} onSearch={this.handleInput.bind(this)} style={{ width: 400 }}/>
                 <Input addonBefore="经纬度" placeholder="自动匹配" value={this.state.locationValue} style={{ width: 400, marginTop: 30 }} disabled={true}/>
+                <Input placeholder="联系电话" value={this.state.aedPhone} style={{ width: 400, marginTop: 30 }} onChange={this.handleInputText.bind(this, 'aedPhone')} />
                 <Input placeholder="详细地址" value={this.state.locationDec} style={{ width: 400, marginTop: 30 }} onChange={this.handleDecInput.bind(this)} />
                 <RadioGroup onChange={this.handleRadio.bind(this)} value={this.state.radioValue} style={{ marginTop: 30, marginLeft: 10}}>
                   <Radio value={0}>启用</Radio>
